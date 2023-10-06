@@ -1,11 +1,11 @@
 import './App.css';
-import { useState } from "react";                               
-function App() {
-  const [productName, setProductName] = useState();
-  const [productCategory, setProductCategory] = useState();
-  const [productMrp, setProductMrp] = useState();
-  const [productWeight, setProductWeight] = useState();
+import { useState,useEffect } from "react";                               
+import AddDetails from './components/AddData';
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import ViewData from './components/ViewData';
 
+function App() {
+  const[productData,setProductData] = useState([]);
   const addData = async (data) => {
     const res = await fetch("http://localhost:5000/insertProduct", {
       method: "POST",
@@ -15,40 +15,64 @@ function App() {
       body: JSON.stringify(data)
     })
     console.log(data)
-
   }
-
-  const handleSubmission = (e) => {
-    e.preventDefault();
-    addData(
-      {
-        productName,
-        productCategory,
-        productMrp,
-        productWeight
+  const getTasks = async () => {
+    const productDetailsFromServer = await fetch("http://localhost:5000/product");
+    const data =  await productDetailsFromServer.json();
+    return data;
+  }
+  /* useEffect(() => {
+    const getTasks = async () => {
+      try {
+        const productDetailsFromServer = await fetch("http://localhost:5000/insertProduct");
+        const data = await productDetailsFromServer.json();
+        
+          setProductName(data.productName);
+          setProductCategory(data.productCategory);
+          setProductMrp(data.productMrp);
+          setProductWeight(data.productWeight);
+  
+        const currentTimeStamp = getTimeStamp();
+        var createdAt = currentTimeStamp;
+        var modifyAt = currentTimeStamp;
+  
+      } catch (error) {
+        console.error('Error fetching product details:', error);
       }
-    )
-    setProductName("");
-    setProductCategory("");
-    setProductMrp("");
-    setProductWeight("");
-  }
+    };
+  
+    getTasks();
+  }, []);
+   */
+  useEffect(() => {
+    const getDetails = async () => {
+      const productDetails = await getTasks()
+      setProductData(productDetails)
+    };
+    getDetails();
+  },[])
+  // console.log(productData);
+  const deleteDetails = async (id) => {
+
+    await fetch(`http://localhost:5000/remove/${id}`, {
+      method: "DELETE",
+    });
+    setProductData(productData.filter((val) => val.product_id !== id));
+  };
 
   return (
     <>
-      <form onSubmit={handleSubmission}>
-        <label for="productName">Product Name: &nbsp;</label>
-        <input type="text" placeholder="Enter the product name" value={productName} onChange={(e) => setProductName(e.target.value)} required /><br></br>
-        <label for="productCategory">Product Category: &nbsp;</label>
-        <input type="text" placeholder="Enter the product category" value={productCategory} onChange={(e) => setProductCategory(e.target.value)} required /><br></br>
-        <label for="productMrp">MRP: &nbsp;</label>
-        <input type="text" placeholder="Enter the MRP" value={productMrp} onChange={(e) => setProductMrp(e.target.value)} required /><br></br>
-        <label for="productWeight">Weight: &nbsp;</label>
-        <input type="text" placeholder="Enter the weight" value={productWeight} onChange={(e) => setProductWeight(e.target.value)} required /><br></br>
-        <button type="submit">Submit</button>
-      </form>
+        {/* <AddDetails data={addData}/> */}
+
+      <Router>
+        <Routes>
+          <Route path='/add' element={<AddDetails data={addData}/>}/>
+          <Route path='/view' element={<ViewData pData={productData} onDelete={deleteDetails}/>}/>
+        </Routes>
+      </Router>
+          
     </>
   );
-}
 
+}
 export default App;
