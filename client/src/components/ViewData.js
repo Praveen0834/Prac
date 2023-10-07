@@ -1,4 +1,13 @@
-const ViewData = ({ pData,onDelete }) => {
+import { useNavigate } from "react-router-dom"
+
+const ViewData = ({ pData,onDelete,updateId }) => {
+
+    const navigate = useNavigate()
+
+    const onUpdate = (productId) => {
+        updateId(productId)
+        navigate("/update")
+    }
 
     return (
         <>
@@ -21,6 +30,7 @@ const ViewData = ({ pData,onDelete }) => {
                             <td>{data.created_at}</td>&nbsp;
                             <td>{data.modified_at}</td>&nbsp;
                             <td><button onClick={()=>onDelete(data.product_id)}>Delete</button></td>
+                            <td><button onClick={()=>onUpdate(data.product_id)}>Update</button></td>
                         </tr>
                     </>
                 )
