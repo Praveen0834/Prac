@@ -1,6 +1,8 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom";
 
 const AddDetails = ({data}) => {
+  const navigate = useNavigate();
     const[productName,setProductName] = useState();
     const[productCategory,setProductCategory] = useState();
     const[productMrp,setProductMrp] = useState();
@@ -51,6 +53,7 @@ const AddDetails = ({data}) => {
                 <input type="text" placeholder="Enter the weight" value={productWeight} onChange={(e) => setProductWeight(e.target.value)} required /><br></br>
                 <button type="submit">Submit</button>
             </form>
+            <button onClick={()=>navigate('/view')}>View</button>
         </>
     )
 }

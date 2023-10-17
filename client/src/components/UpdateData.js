@@ -1,54 +1,36 @@
-import { useNavigate } from "react-router-dom"
 import { useState } from "react"; 
 
-const UpdateData= ({pData,updateId})=>{
-    const[productName,setProductName] = useState();
-    const[productCategory,setProductCategory] = useState();
-    const[productMrp,setProductMrp] = useState();
-    const[productWeight,setProductWeight] = useState();
-    const navigate = useNavigate()
+const UpdateData= ({updateId})=>{
     
-    const handleSubmission = (e) => {
+    const id = JSON.parse(sessionStorage.getItem('detail')).id;
+    const name = JSON.parse(sessionStorage.getItem('detail')).name;
+    const category = JSON.parse(sessionStorage.getItem('detail')).category;
+    const mrp = JSON.parse(sessionStorage.getItem('detail')).mrp;
+    const weight = JSON.parse(sessionStorage.getItem('detail')).weight;
 
-    const UpdateMain = async (details, id) => {
+    const[productName,setProductName] = useState(name);
+    const[productCategory,setProductCategory] = useState(category);
+    const[productMrp,setProductMrp] = useState(mrp);
+    const[productWeight,setProductWeight] = useState(weight);
 
-        details={
-            "product_id" :productName,
-            "product_catagory" :productCategory,
-            "product_mrp" :productMrp,
-            "product_weight" :productWeight
-        }
-
-        const res = await fetch(`http://localhost:5000/umain/${id}`, {
-        method: "PUT",
-        headers: {
-            "Content-type": "application/json",
-        },
-        body: JSON.stringify(details),
-        });
-        const resp = await res.json();     
-        
-        navigate("/view")
-    }
+    const handleSubmission = async (e) => {
+        e.preventDefault()
+        console.log("Submitted");
+        updateId({productName,productCategory,productMrp,productWeight},id);
 }
 
  return(
-    
-    pData.map((data)=>{
-        if(data.product_id==updateId){
-            <form onSubmit={handleSubmission}>
-                <label for="productName">Product Name: &nbsp;</label>
-                <input type="text" placeholder={data.product_name} value={productName} onChange={(e) => setProductName(e.target.value)} required /><br></br>
-                <label for="productCategory">Product Category: &nbsp;</label>
-                <input type="text" placeholder={data.product_catagory} value={productCategory} onChange={(e) => setProductCategory(e.target.value)} required /><br></br>
-                <label for="productMrp">MRP: &nbsp;</label>
-                <input type="text" placeholder={data.mrp} value={productMrp} onChange={(e) => setProductMrp(e.target.value)} required /><br></br>
-                <label for="productWeight">Weight: &nbsp;</label>
-                <input type="text" placeholder={data.weight} value={productWeight} onChange={(e) => setProductWeight(e.target.value)} required /><br></br>
-                <button type="submit">Submit</button>
-            </form>
-        }
-    })    
+    <form onSubmit={handleSubmission}>
+    <label for="productName">Product Name: &nbsp;</label>
+    <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)} required /><br></br>
+    <label for="productCategory">Product Category: &nbsp;</label>
+    <input type="text" value={productCategory} onChange={(e) => setProductCategory(e.target.value)} required /><br></br>
+    <label for="productMrp">MRP: &nbsp;</label>
+    <input type="text" value={productMrp} onChange={(e) => setProductMrp(e.target.value)} required /><br></br>
+    <label for="productWeight">Weight: &nbsp;</label>
+    <input type="text" value={productWeight} onChange={(e) => setProductWeight(e.target.value)} required /><br></br>
+    <button type="submit">Submit</button>
+</form>   
  )}
 
  export default UpdateData

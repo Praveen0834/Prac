@@ -6,8 +6,7 @@ import ViewData from './components/ViewData';
 import UpdateData from './components/UpdateData';
 
 function App() {  
-  const[productData,setProductData] = useState([]);
-  const [updateId, setUpdateId] = useState(null)
+  const [productData,setProductData] = useState([]);
   
   const addData = async (data) => {
     const res = await fetch("http://localhost:5000/insertProduct", {
@@ -17,8 +16,11 @@ function App() {
       },
       body: JSON.stringify(data)
     })
+    const resp = await res.json();
+    setProductData([...productData,resp]);
     console.log(data)
   }  
+
   const getTasks = async () => {
     const productDetailsFromServer = await fetch("http://localhost:5000/product");
     const data =  await productDetailsFromServer.json();
@@ -33,6 +35,19 @@ function App() {
     getDetails();
   },[])
 
+
+  const updateDetails = async (details,id) => {
+    const res = await fetch(`http://localhost:5000/product/${id}`, {
+      method: "PUT",
+      headers: {
+          "Content-type": "application/json",
+      },
+      body: JSON.stringify(details),
+      });
+      const resp = await res.json();
+      setProductData([...productData, resp]);
+  }
+
   const deleteDetails = async (id) => {
 
     await fetch(`http://localhost:5000/remove/${id}`, {
@@ -45,11 +60,12 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route path='/add' element={<AddDetails data={addData}/>}/>
-          <Route path='/view' element={<ViewData pData={productData} onDelete={deleteDetails} updateId={setUpdateId}/>}/>
-          <Route path='/update' element={<UpdateData pData={productData} updateId={updateId}/>}/>
+          <Route path='/' element={<AddDetails data={addData}/>}/>
+          <Route path='/view' element={<ViewData pData={productData} onDelete={deleteDetails}/>}/>
+          <Route path='/update' element={<UpdateData pData={productData} updateId={updateDetails}/>}/>
         </Routes>
-      </Router>          
+      </Router>  
+      <ViewData pData={productData} onDelete={deleteDetails}/>        
     </>
   );
 
